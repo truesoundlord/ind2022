@@ -8,8 +8,7 @@ class MemoryGame
 		this.cards = [...this.cardsContainer];
 		this.flippedCards = [];
 		this.delay = 1000;
-		//alert("Constructor... "+this.cards.length+" elements");
-
+		
 		// Tentative de mélange
 
 		this.indexes = [...this.cardsContainer];
@@ -23,10 +22,9 @@ class MemoryGame
 		// nous avons un tableau avec les indices
 
 		this.indexes.sort(function(a,b){return 0.75 - Math.random()});
-		//alert(this.indexes);
 
 		// Les indices sont distribués de manière "aléatoire"
-		// BUG: souvent la première et la dernière image sont identiques
+		// BUG: souvent la première et la dernière image sont identiques (plus le cas avec .75 au lieu de .50)
 
 		this.cpt=0;
 		while(this.cpt<this.cards.length)
@@ -38,7 +36,7 @@ class MemoryGame
 		}
 	}
 
-	// Pouvoir recommencer une partie
+	// Pouvoir recommencer une partie...
 	Victory()
 	{
 		this.cardsContainer = document.getElementById("plateau").getElementsByTagName("img");
@@ -47,6 +45,9 @@ class MemoryGame
 		this.delay = 1000;
 		this.indexes = [...this.cardsContainer];
 		this.cpt=0;
+		
+		// nous faisons en sorte de ne disposer que les cartes retournées...
+		
 		while(this.cpt<this.indexes.length)
 		{
 			this.cards[this.cpt].src="../html/images/card-cover.png";
@@ -57,8 +58,7 @@ class MemoryGame
 		// nous avons un tableau avec les indices
 
 		this.indexes.sort(function(a,b){return 0.75 - Math.random()});
-		//alert(this.indexes);
-
+		
 		// Les indices sont distribués de manière aléatoire
 
 		this.cpt=0;
@@ -71,7 +71,7 @@ class MemoryGame
 		}
 
 		this.cards.forEach(card => {
-		// card.addEventListener('click', game.flip.bind(game, card));
+		
 		card.classList.remove('no-event');			// enlever les "flags" no-event
 		card.classList.remove('has-match');			// enlever les "flags" has-match
 		});
@@ -79,54 +79,47 @@ class MemoryGame
 
 	validateCards()
 	{
-		//const [firstCard, secondCard] = this.flippedCards;
+		const firstCard=this.flippedCards.pop();					// on place la carte sur la pile (comme les assiettes)
+		const secondCard=this.flippedCards.pop();					// on place l'autre carte sélectionnée sur la pile
 
-		//alert("First "+firstCard.alt);
-		//alert("Second "+secondCard.alt);
+		firstCard.classList.toggle('no-event');						// pendant ce temps on s'assure de ne pas pouvoir cliquer de nouveau sur cette carte retournée
+		secondCard.classList.toggle('no-event');					// ...idem pour l'autre carte retournée
 
-		const firstCard=this.flippedCards.pop();
-		const secondCard=this.flippedCards.pop();
-
-		firstCard.classList.toggle('no-event');
-		secondCard.classList.toggle('no-event');
-
-		if (firstCard.alt === secondCard.alt)
+		// si les deux cartes sont identiques en comparant les attributs "alt"
+		if (firstCard.alt === secondCard.alt)							
 		{
-			firstCard.classList.replace('flipped', 'has-match');
-			secondCard.classList.replace('flipped', 'has-match');
-
 			
-			//this.flippedCards = [];
+			// Dans ma première version j'ai fait un oubli...
+			
+			firstCard.classList.add('has-match');						// indiquer que les cartes correspondent...
+			secondCard.classList.add('has-match');					// ...en ajoutant le "flag" has-match aux deux cartes
 
+			// Vérifier si toutes les cartes ont été retournées...
+			
       setTimeout(() =>
       {
 				const allHaveMatches = this.cards.every(card =>
 				(
-					card.classList.contains('has-match')
+					card.classList.contains('has-match')	// si la carte contient la classe/le flag "has-match" on ajoute 1 à un compteur interne
         ));
 
-        //firstCard.style.pointerEvents = "none";
-				//secondCard.style.pointerEvents = "none";
-
-        if (allHaveMatches)
+        // Si toutes les cartes (ici 20) ont le flag 'has match' alors... 
+				
+        if (allHaveMatches) // Si le compteur interne correspond au nombre d'éléments de la liste/du tableau "card" allHaveMatches devrait être à "true"...
 				{
-					this.Victory();
+					this.Victory();	// ...nous avons gagné !!
         }
 			}, this.delay);
 		}
-		else
+		else // sinon...
 		{
-			//alert("Perdu !!");
 			setTimeout(() => {
-			firstCard.classList.remove('flipped');
-			secondCard.classList.remove('flipped');
-
-			firstCard.src="../html/images/card-cover.png";
-			secondCard.src="../html/images/card-cover.png";
-
-			//this.flippedCards = [];
-			firstCard.classList.remove('no-event');
-			secondCard.classList.remove('no-event');
+			
+			firstCard.src="../html/images/card-cover.png";			// ...il faut restaurer l'image de la carte comme étant "retournée"
+			secondCard.src="../html/images/card-cover.png";			// ...pareille pour la seconde
+	
+			firstCard.classList.remove('no-event');							// nous pouvons de nouveau "cliquer" sur la carte
+			secondCard.classList.remove('no-event');						// ...et la suivante aussi
 
 			}, this.delay);
 		}
@@ -134,19 +127,25 @@ class MemoryGame
 
 	flip(selectedCard)
 	{
-		//alert("Click "+selectedCard.alt);
-		//alert(selectedCard.classList.toggle('no-event'));
+		// lorsque l'on "clique" sur une image il faut "verouiller" celle-ci
+		// de manière à ce qu'on ne puisse pas cliquer une seconde fois dessus
+		
+		// Grâce à la fonction toggle() de la classe classList nous ajoutons
+		// "un flag" (un drapeau) qui indique l'état de la carte
+		// Ici nous vérifions si le "flag" no-event est présent ou non
+		// Si il est présent nous ne faisons rien (false)
+		// Sinon nous vérifions si deux cartes ont été sélectionnées
+		// au moyen de la méthode/attribut length du tableau flippedCards...
 
 		if(selectedCard.classList.toggle('no-event')==true)
 		{
-			// selectedCard.classList.add('flipped'); // à quoi ça sert ??? boh ???
 			selectedCard.src="../html/images/"+selectedCard.alt+".png";
 
 			this.flippedCards.push(selectedCard);
 
 			if (this.flippedCards.length === 2)
 			{
-				this.validateCards();
+				this.validateCards(); // si deux cartes ont été sélectionnées alors on valide les cartes...
 			}
 		}
 	}
