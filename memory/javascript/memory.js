@@ -82,9 +82,6 @@ class MemoryGame
 		const firstCard=this.flippedCards.pop();					// on place la carte sur la pile (comme les assiettes)
 		const secondCard=this.flippedCards.pop();					// on place l'autre carte sélectionnée sur la pile
 
-		firstCard.classList.toggle('no-event');						// pendant ce temps on s'assure de ne pas pouvoir cliquer de nouveau sur cette carte retournée
-		secondCard.classList.toggle('no-event');					// ...idem pour l'autre carte retournée
-
 		// si les deux cartes sont identiques en comparant les attributs "alt"
 		if (firstCard.alt === secondCard.alt)							
 		{
