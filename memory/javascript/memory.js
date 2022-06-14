@@ -71,7 +71,6 @@ class MemoryGame
 		}
 
 		this.cards.forEach(card => {
-		
 		card.classList.remove('no-event');			// enlever les "flags" no-event
 		card.classList.remove('has-match');			// enlever les "flags" has-match
 		});
@@ -134,6 +133,7 @@ class MemoryGame
 		// Sinon nous vérifions si deux cartes ont été sélectionnées
 		// au moyen de la méthode/attribut length du tableau flippedCards...
 
+		if(selectedCard.classList.contains('has-match')==true) return;	// si la carte est renseignée comme étant "une paire" il ne faut pas continuer...
 		if(selectedCard.classList.toggle('no-event')==true)
 		{
 			selectedCard.src="../html/images/"+selectedCard.alt+".png";
